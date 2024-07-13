@@ -1,0 +1,71 @@
+:root {
+    --white: #e2e8f0;
+    --black: #020617;
+    --primary: #00386e;
+    padding: 15px;
+}
+
+body {
+    color: var(--black);
+    background-color: var(--white);
+}
+
+body * {
+    margin: 7px;
+}
+
+.h1, .h2, .h3, .h4 {
+    color: var(--primary);
+    font-weight: bold;
+    font-family: monospace;
+}
+
+.h1 {
+    font-size: 500%;
+}
+
+.h2 {
+    font-size: 350%;
+}
+
+.h3 {
+    font-size: 200%;
+}
+
+.h4 {
+    font-size: 150%;
+}
+
+.time {
+    color: var(--black);
+    font-weight: bold;
+    font-family: monospace;
+    font-size: 300%;
+}
+
+.navigationLink {
+    color: var(--primary);
+    font-weight: bold;
+    font-family: monospace;
+    font-size: 700%;
+}
+
+#navigationLink {
+    position: absolute;
+    left: 40%;
+    top: 40%;
+}
+
+div[id="inputForm:rValue"] .ui-state-active {
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+.commandButton {
+    color: var(--primary);
+    font-weight: bold;
+    font-family: monospace;
+    font-size: 150%;
+    background-color: #cadaef;
+    border: 2px var(--primary) solid;
+}

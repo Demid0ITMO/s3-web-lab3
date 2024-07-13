@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ui="http://java.sun.com/jsf/facelets">
+<h:head>
+    <title>Третья лаба</title>
+    <link rel="stylesheet" type="text/css" href="css/styles.css"/>
+</h:head>
+<h:body>
+    <h:outputText value="Рязанов Демид Витальевич P3221 вариант 2133" styleClass="h1"/><br/>
+    <h:link value="На главную" outcome="startPage" styleClass="h2"/>
+    <h:panelGrid columns="3" id="bodyPanel">
+        <h:panelGroup id="inputPanel">
+            <h:form id="inputForm">
+                <h:panelGrid columns="2">
+                    <h:panelGroup id="xValuePanel">
+                        <h:outputLabel for="xValue" value="Введите X" styleClass="h3"/><br/>
+                        <h:selectOneRadio id="xValue" value="#{xBean.value}" layout="pageDirection" styleClass="h4">
+                            <f:selectItems value="#{xBean.possibleValues}"/>
+                            <f:ajax execute="xValue" render="@all" immediate="true"/>
+                        </h:selectOneRadio>
+                    </h:panelGroup>
+                    <h:panelGrid columns="1">
+                        <h:panelGroup id="yValuePanel">
+                            <h:outputLabel for="yValue" value="Введите Y (-3..5)" styleClass="h3"/><br/>
+                            <h:inputText id="yValue" value="#{yBean.value}" maxlength="7"
+                                         required="true" requiredMessage="#{yBean.message}"
+                                         converterMessage="#{yBean.message}" validatorMessage="#{yBean.message}">
+                                <f:validateRequired for="yValue"/>
+                                <f:converter for="yValue" converterId="jakarta.faces.Double"/>
+                                <f:validateDoubleRange for="yValue" minimum="#{yBean.minimum}" maximum="#{yBean.maximum}"/>
+                                <f:ajax execute="yValue" render="@all" immediate="true"/>
+                            </h:inputText>
+                        </h:panelGroup>
+                        <h:panelGroup id="rValuePanel">
+                            <h:outputLabel for="rValue" value="Введите R" styleClass="h3"/><br/>
+                            <p:selectOneButton id="rValue" value="#{rBean.value}" required="true" requiredMessage="Выберите R" styleClass="h4">
+                                <f:selectItems value="#{rBean.possibleValues}"/>
+                                <f:validateRequired for="rValue"/>
+                                <f:ajax execute="rValue" render="@all" immediate="true"/>
+                            </p:selectOneButton>
+                            <h:inputHidden id="rVal" value="#{rBean.value}"/>
+                        </h:panelGroup>
+                        <h:panelGroup id="submitButton">
+                            <h:commandButton value="Submit" id="submit" styleClass="commandButton">
+                                <f:ajax execute="@all" for="submit" listener="#{hitChecker.check(xBean.isValid() and yBean.isValid() and rBean.isValid(), xBean.value, yBean.value, rBean.value)}" render="@all" resetValues="true"/>
+                            </h:commandButton>
+                        </h:panelGroup>
+                    </h:panelGrid>
+                </h:panelGrid>
+                <h:panelGroup id="messagesPanel">
+                    <h:outputText id="chosen" value="Выбранные значения: x = #{xBean.value}, y = #{yBean.value}, r = #{rBean.value}." styleClass="h4"/><br/>
+                    <p:messages id="messages" showSummary="true" showDetail="false" autoUpdate="true" rendered="#{not (xBean.isValid() and yBean.isValid() and rBean.isValid())}" styleClass="messages"/>
+                </h:panelGroup>
+            </h:form>
+        </h:panelGroup>
+        <h:panelGroup id="imagePanel">
+                <p:remoteCommand name="send" update="@all" action="#{hitChecker.checkFromSVG()}"/>
+                <script type="text/javascript">
+                    function checkFromSVG(e) {
+                        let target = document.querySelector("svg").getBoundingClientRect();
+                        let r = document.getElementById("inputForm:rVal");
+                        if (!(r.value == null || isNaN(r.value))) {
+                            let px = e.clientX - target.left;
+                            let py = e.clientY - target.top;
+                            let x = ((px - 300) * r.value / 200).toFixed(2);
+                            let y = (-(py - 300) * r.value / 200).toFixed(2);
+                            document.getElementById("inputForm:xValue").value = x;
+                            document.getElementById("inputForm:yValue").value = y;
+                            send([{name: "x", value: x}, {name: "y", value: y}, {name: "r", value: r.value}]);
+                        }
+                    }
+                </script>
+                <svg width="600px" height="600px" onclick="checkFromSVG(event)">
+                    <!-- arrows -->
+                    <polygon points="300,0 290,20 310,20" stroke="#2c2d2a"/>
+                    <polygon points="600,300 580,290 580,310" stroke="#2c2d2a"/>
+
+                    <!-- rectangle -->
+                    <polygon points="100,100 100,300 300,300 300,100" fill="#0783ff"/>
+
+                    <!-- triangle -->
+                    <polygon points="100,300 300,300 300,400" fill="#0783ff"/>
+
+                    <!-- circle -->
+                    <path d="M 400,300 A 100,100 90 0,1 300,400 L 300,300 Z" fill="#0783ff"/>
+
+                    <!-- axis -->
+                    <line x1="0" x2="600" y1="300" y2="300" stroke="#2c2d2a"/>
+                    <line x1="300" x2="300" y1="0" y2="600" stroke="#2c2d2a"/>
+
+                    <!-- labels on the axis x -->
+                    <line x1="100" x2="100" y1="290" y2="310" stroke="#2c2d2a"/>
+                    <line x1="200" x2="200" y1="290" y2="310" stroke="#2c2d2a"/>
+                    <line x1="400" x2="400" y1="290" y2="310" stroke="#2c2d2a"/>
+                    <line x1="500" x2="500" y1="290" y2="310" stroke="#2c2d2a"/>
+
+                    <!-- labels on the axis y -->
+                    <line x1="290" x2="310" y1="100" y2="100" stroke="#2c2d2a"/>
+                    <line x1="290" x2="310" y1="200" y2="200" stroke="#2c2d2a"/>
+                    <line x1="290" x2="310" y1="400" y2="400" stroke="#2c2d2a"/>
+                    <line x1="290" x2="310" y1="500" y2="500" stroke="#2c2d2a"/>
+
+                    <line x1="0" x2="0" y1="0" y2="600" stroke="#2c2d2a"/>
+                    <line x1="0" x2="600" y1="0" y2="0" stroke="#2c2d2a"/>
+                    <line x1="600" x2="600" y1="600" y2="0" stroke="#2c2d2a"/>
+                    <line x1="0" x2="600" y1="600" y2="600" stroke="#2c2d2a"/>
+
+                    <line x1="0" x2 ="600" y1="#{300+600/rBean.value}" y2="#{300+600/rBean.value}" stroke="red"/>
+                    <polygon points="0,600 0,#{300+600/rBean.value} 600,#{300+600/rBean.value} 600,600" fill="#2c2d2a30"/>
+
+                    <line x1="0" x2 ="600" y1="#{300-1000/rBean.value}" y2="#{300-1000/rBean.value}" stroke="red"/>
+                    <polygon points="0,0 0,#{300-1000/rBean.value} 600,#{300-1000/rBean.value} 600,0" fill="#2c2d2a30"/>
+
+                    <!-- axis labels -->
+                    <text x="580" y="280">x</text>
+                    <text x="310" y="20">y</text>
+
+                    <!-- R values on the axis x -->
+                    <text x="80" y="276"><h:outputText value="#{-rBean.value}"/></text>
+                    <text x="170" y="276"><h:outputText value="#{-rBean.value/2}"/></text>
+                    <text x="380" y="276"><h:outputText value="#{rBean.value/2}"/></text>
+                    <text x="490" y="276"><h:outputText value="#{rBean.value}"/></text>
+
+                    <!-- R values on the axis y -->
+                    <text x="324" y="508"><h:outputText value="#{-rBean.value}"/></text>
+                    <text x="324" y="408"><h:outputText value="#{-rBean.value/2}"/></text>
+                    <text x="324" y="208"><h:outputText value="#{rBean.value/2}"/></text>
+                    <text x="324" y="108"><h:outputText value="#{rBean.value}"/></text>
+
+                    <ui:repeat value="#{hitChecker.history}" var="point">
+                        <h:panelGroup rendered="#{point.r == rBean.value}">
+                            <circle class="#{point.r}" r="3"
+                                    cx="#{300 + (200 * point.x) / point.r}"
+                                    cy="#{300 - (200 * point.y) / point.r}"
+                                    fill="#{point.color}">
+                            </circle>
+                        </h:panelGroup>
+                    </ui:repeat>
+
+                </svg>
+        </h:panelGroup>
+        <h:panelGroup id="tablePanel">
+            <h:commandButton value="Clear" id="clear" styleClass="commandButton">
+                <f:ajax execute="clear" for="clear" listener="#{hitChecker.clearHistory()}" render="@all"/>
+            </h:commandButton>
+            <h:dataTable value="#{hitChecker.history}" var="point" styleClass="h4">
+                <h:column>
+                    <f:facet name="header">X</f:facet>
+                    #{point.x}
+                </h:column>
+                <h:column>
+                    <f:facet name="header">Y</f:facet>
+                    #{point.y}
+                </h:column>
+                <h:column>
+                    <f:facet name="header">R</f:facet>
+                    #{point.r}
+                </h:column>
+                <h:column>
+                    <f:facet name="header">Текущее время</f:facet>
+                    #{point.currentTime}
+                </h:column>
+                <h:column>
+                    <f:facet name="header">Результат</f:facet>
+                    #{point.result}
+                </h:column>
+            </h:dataTable>
+        </h:panelGroup>
+    </h:panelGrid>
+</h:body>
+</html>
